@@ -2,7 +2,6 @@ package com.ou.springcode.controller;
 
 import java.util.List;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ou.springcode.dto.UserReponse;
 import com.ou.springcode.dto.UserRequest;
+import com.ou.springcode.dto.UserPatchRequest;
 import com.ou.springcode.service.UserService;
 
 import jakarta.validation.Valid;
@@ -54,10 +54,10 @@ public class UserController {
         return userService.update(id, request);
     }
 
-    /** PATCH /api/users/{id} - Cập nhật một phần user (cùng body với PUT) */
+    /** PATCH /api/users/{id} - Cập nhật một phần: chỉ gửi field cần đổi (username, email, fullName đều optional) */
     @PatchMapping("/{id}")
-    public ResponseEntity<UserReponse> patchUpdate(@PathVariable Long id, @Valid @RequestBody UserRequest request) {
-        return userService.update(id, request);
+    public ResponseEntity<UserReponse> patchUpdate(@PathVariable Long id, @Valid @RequestBody UserPatchRequest request) {
+        return userService.patchUpdate(id, request);
     }
 
     /** DELETE /api/users/{id} - Xóa user */
