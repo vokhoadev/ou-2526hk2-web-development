@@ -1,0 +1,117 @@
+[
+  {
+    "name": "Tao user 1",
+    "method": "POST",
+    "path": "/api/users",
+    "body": {
+      "username": "nguyenvana",
+      "email": "vana@ou.edu.vn",
+      "fullName": "Nguyen Van A"
+    },
+    "expect": 200
+  },
+  {
+    "name": "Tao user 2",
+    "method": "POST",
+    "path": "/api/users",
+    "body": {
+      "username": "tranthib",
+      "email": "thib@ou.edu.vn",
+      "fullName": "Tran Thi B"
+    },
+    "expect": 200
+  },
+  {
+    "name": "Lay tat ca users",
+    "method": "GET",
+    "path": "/api/users",
+    "body": null,
+    "expect": 200
+  },
+  {
+    "name": "Lay user theo ID",
+    "method": "GET",
+    "path": "/api/users/1",
+    "body": null,
+    "expect": 200
+  },
+  {
+    "name": "Update toan bo user 1",
+    "method": "PUT",
+    "path": "/api/users/1",
+    "body": {
+      "username": "nguyenvana_updated",
+      "email": "vana.updated@ou.edu.vn",
+      "fullName": "Nguyen Van A (Updated)"
+    },
+    "expect": 200
+  },
+  {
+    "name": "Patch user 2 - chi email",
+    "method": "PATCH",
+    "path": "/api/users/2",
+    "body": {
+      "email": "thib.new@ou.edu.vn"
+    },
+    "expect": 200
+  },
+  {
+    "name": "Patch user 1 - chi fullName",
+    "method": "PATCH",
+    "path": "/api/users/1",
+    "body": {
+      "fullName": "Nguyen Van A - Senior Dev"
+    },
+    "expect": 200
+  },
+  {
+    "name": "Verify sau update",
+    "method": "GET",
+    "path": "/api/users",
+    "body": null,
+    "expect": 200
+  },
+  {
+    "name": "Xoa user 2",
+    "method": "DELETE",
+    "path": "/api/users/2",
+    "body": null,
+    "expect": 204
+  },
+  {
+    "name": "Verify user da xoa (expect 404)",
+    "method": "GET",
+    "path": "/api/users/2",
+    "body": null,
+    "expect": 404
+  },
+  {
+    "name": "Validation: username rong (expect 400)",
+    "method": "POST",
+    "path": "/api/users",
+    "body": {
+      "username": "",
+      "email": "test@ou.edu.vn",
+      "fullName": "Test"
+    },
+    "expect": 400
+  },
+  {
+    "name": "Validation: email sai format (expect 400)",
+    "method": "POST",
+    "path": "/api/users",
+    "body": {
+      "username": "testuser",
+      "email": "not-an-email",
+      "fullName": "Test"
+    },
+    "expect": 400
+  },
+  {
+    "name": "Xoa user khong ton tai (expect 404)",
+    "method": "DELETE",
+    "path": "/api/users/999",
+    "body": null,
+    "expect": 404
+  }
+]
