@@ -2,22 +2,14 @@ package com.ou.springcode.dto;
 
 import java.time.LocalDateTime;
 
-import com.ou.springcode.model.User;
+import com.ou.springcode.entity.Role;
 
 public record UserReponse(
     Long id,
     String username,
     String email,
+    Role role,
     String fullName,
-    LocalDateTime createdAt
-) {
-    public static UserReponse fromEntity(User user) {
-        return new UserReponse(
-            user.getId(),
-            user.getUsername(),
-            user.getEmail(),
-            user.getFullName(),
-            user.getCreatedAt()
-        );
-    }
-}
+    LocalDateTime createdAt,
+    LocalDateTime updatedAt
+) {}

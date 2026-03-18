@@ -9,8 +9,8 @@ import org.springframework.stereotype.Service;
 
 import com.ou.springcode.dto.UserReponse;
 import com.ou.springcode.dto.UserRequest;
+import com.ou.springcode.entity.User;
 import com.ou.springcode.dto.UserPatchRequest;
-import com.ou.springcode.model.User;
 import com.ou.springcode.repository.UserRepository;
 
 @Service
