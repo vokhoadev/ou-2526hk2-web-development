@@ -1,78 +1,55 @@
 package com.ou.springcode.service;
-
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.ou.springcode.dto.UserReponse;
 import com.ou.springcode.dto.UserRequest;
+import com.ou.springcode.entity.Role;
 import com.ou.springcode.entity.User;
-import com.ou.springcode.dto.UserPatchRequest;
+import com.ou.springcode.exception.DuplicateResourceException;
 import com.ou.springcode.repository.UserRepository;
 
 @Service
-public class UserService implements IUserService {
-
+public class UserService {
+    private static final Logger log = LoggerFactory.getLogger(UserService.class);
     private final UserRepository userRepository;
+    private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, UserMapper userMapper, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.userMapper = userMapper;
+        this.passwordEncoder = passwordEncoder;
     }
 
-    @Override
-    public List<UserReponse> findAll() {
-        return userRepository.findAll().stream()
-                .map(UserReponse::fromEntity)
-                .collect(Collectors.toList());
+    @Transactional(readOnly = true)
+    public Page<UserReponse> findAll(String search, Role role, Pageable pageable) {
+        Page<User> page = userRepository.findAllSearchAndRole(search, role, pageable);
+        return page.map(userMapper::toReponse);
     }
 
-    @Override
-    public ResponseEntity<UserReponse> findById(Long id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
-        return ResponseEntity.ok(UserReponse.fromEntity(user));
-    }
+    @Transactional()
+    public UserReponse create(UserRequest request) {
+        if(userRepository.existsByUsername(request.username())){
+            throw new DuplicateResourceException("Username đã tồn tại");
+        }
+        if(userRepository.existsByEmail(request.email())){
+            throw new DuplicateResourceException("Email đã tồn tại");
+        }
 
-    @Override
-    public ResponseEntity<UserReponse> create(UserRequest request) {
-        User user = new User();
-        user.setUsername(request.username());
-        user.setEmail(request.email());
-        user.setFullName(request.fullName());
-        User saved = userRepository.save(user);
-        return ResponseEntity.status(HttpStatus.CREATED).body(UserReponse.fromEntity(saved));
-    }
-
-    @Override
-    public ResponseEntity<UserReponse> update(Long id, UserRequest request) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
-        user.setUsername(request.username());
-        user.setEmail(request.email());
-        user.setFullName(request.fullName() != null ? request.fullName() : user.getFullName());
-        User updated = userRepository.save(user);
-        return ResponseEntity.ok(UserReponse.fromEntity(updated));
-    }
-
-    @Override
-    public ResponseEntity<UserReponse> patchUpdate(Long id, UserPatchRequest request) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
-        if (request.username() != null) user.setUsername(request.username());
-        if (request.email() != null) user.setEmail(request.email());
-        if (request.fullName() != null) user.setFullName(request.fullName());
-        User updated = userRepository.save(user);
-        return ResponseEntity.ok(UserReponse.fromEntity(updated));
-    }
-
-    @Override
-    public boolean deleteById(Long id) {
-        if (!userRepository.existsById(id))
-            return false;
-        userRepository.deleteById(id);
-        return true;
+        User user = User.builder()
+                    .username(request.username())
+                    .email(request.email())
+                    .passwordHash(passwordEncoder.encode(request.password()))
+                    .role(Role.USER)
+                    .build();
+        user = userRepository.save(user);
+        log.info("User create: {} by admin", user.getUsername());
+        return userMapper.toReponse(user);
     }
 }

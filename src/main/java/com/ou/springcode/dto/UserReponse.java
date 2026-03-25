@@ -1,6 +1,6 @@
 package com.ou.springcode.dto;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 import com.ou.springcode.entity.Role;
 
@@ -10,6 +10,6 @@ public record UserReponse(
     String email,
     Role role,
     String fullName,
-    LocalDateTime createdAt,
-    LocalDateTime updatedAt
+    Instant createdAt,
+    Instant updatedAt
 ) {}

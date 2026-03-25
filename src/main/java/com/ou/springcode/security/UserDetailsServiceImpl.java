@@ -6,10 +6,12 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
 
 import com.ou.springcode.entity.User;
 import com.ou.springcode.repository.UserRepository;
 
+@Service
 public class UserDetailsServiceImpl implements UserDetailsService {
 
     private final UserRepository userRepository;
@@ -24,7 +26,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             .orElseGet(() -> userRepository.findByEmail(username).orElse(null));
 
         if(user == null) {
-            // TO DO
+            throw new UsernameNotFoundException("User not found: " + username);
         }
         return new org.springframework.security.core.userdetails.User(
             user.getUsername(), 
